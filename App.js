@@ -2,6 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '@rneui/themed';
 import Login from './modules/auth/adapters/components/Login';
+import Navigation from './config/navigation/Navigation';
 import { initializeApp } from "firebase/app";
 
 export default function App() {
@@ -19,9 +20,7 @@ export default function App() {
   const app = initializeApp(firebaseConfig);
   
   return (
-    <View style={styles.container}> 
-      <Login name={'Mike'} /> 
-    </View>
+    <Navigation/>
   );
 }
 
