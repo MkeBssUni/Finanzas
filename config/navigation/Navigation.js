@@ -2,8 +2,9 @@ import React from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Icon } from "@rneui/base";
-import About from "../../modules/about/adapters/screens/About";
-import Profile from "../../modules/profile/adapters/screens/Profile";
+import AboutStack from "../stack/AboutStack";
+import ProfileStack from "../stack/ProfileStack";
+
 const Tab = createBottomTabNavigator();
 
 export default function Navigation() {
@@ -19,15 +20,14 @@ export default function Navigation() {
         })}
       >
         <Tab.Screen 
-            name='profile'
-            options={{title: 'Perfil'}}
-            component={Profile}
-        />
-
-        <Tab.Screen 
             name='about'
             options={{title: 'Conócenos'}}
-            component={About}
+            component={AboutStack}
+        />
+        <Tab.Screen 
+            name='profile'
+            options={{title: 'Perfil'}}
+            component={ProfileStack}
         />
 
       </Tab.Navigator>
