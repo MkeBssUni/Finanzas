@@ -27,7 +27,7 @@ export default function UserGuest(props) {
                     }}
                     buttonStyle={style.btn}
                     containerStyle={style.btnContainer}
-                    onPress={()=> navigation.navigate('profileStack')}
+                    onPress={()=> navigation.navigate('loginStack')}
                 />
             </View>
         </ScrollView>

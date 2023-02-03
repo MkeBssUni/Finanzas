@@ -1,7 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
 import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '@rneui/themed';
-import Login from './modules/auth/adapters/components/Login';
+import Login from './modules/auth/adapters/screens/Login';
 import Navigation from './config/navigation/Navigation';
 import { initializeApp } from "firebase/app";
 
