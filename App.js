@@ -1,24 +1,9 @@
-import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
-import { Button } from '@rneui/themed';
-import Login from './modules/auth/adapters/screens/Login';
+import { StyleSheet} from 'react-native';
 import Navigation from './config/navigation/Navigation';
-import { initializeApp } from "firebase/app";
+import {app} from './config/utils/firebase'
 
-export default function App() {
-  
-  const firebaseConfig = {
-    apiKey: "AIzaSyBhW8N52RyUL2GvReJJfJ-ZtW3_OQM49Vg",
-    authDomain: "finanzas-f41fa.firebaseapp.com",
-    projectId: "finanzas-f41fa",
-    storageBucket: "finanzas-f41fa.appspot.com",
-    messagingSenderId: "481788418291",
-    appId: "1:481788418291:web:9075105e550789a455bf86"
-  };
-  
-  // Initialize Firebase
-  const app = initializeApp(firebaseConfig);
-  
+
+export default function App() {  
   return (
     <Navigation/>
   );
