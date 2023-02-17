@@ -4,6 +4,8 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { isEmpty, size } from "lodash";
 import { Image, Input, Button, Icon } from "@rneui/base";
 import Loading from "../../kernel/components/Loading";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { validateEmail } from "../../kernel/validations";
 
 export default function CreateUser() {
   const payload = {
@@ -16,16 +18,36 @@ export default function CreateUser() {
   const [data, setData] = useState(payload);
   const [showPassword, setShowPassword] = useState(true);
   const [showRepeatPassword, setShowRepeatPassword] = useState(true);
-  
-  const changePayload=(e,type)=>{
-    setData({
-        ...data,[type]: e.nativeEvent.text
-    })
-  }
 
-  const createUser=()=>{
-    console.log("data: ", data);
-  }
+  const changePayload = (e, type) => {
+    setData({
+      ...data,
+      [type]: e.nativeEvent.text,
+    });
+  };
+
+  const auth = getAuth();
+
+  const createUser = () => {
+    if (!(isEmpty(data.email) || isEmpty(data.password))) {
+      if (validateEmail(data.email)) {
+        if (size(data.password) >= 6) {
+          if (data.password == data.repeatPassword) {
+            setError(payload);
+            console.log("listo pal registro");
+          } else {
+            setError({email: "",password: "Las contraseñas no coinciden",repeatPassword: "Las contraseñas no coinciden",});
+          }
+        } else {
+          setError({email: "",password: "La contraseña debe tener al menos 6 caracteres",repeatPassword: "La contraseña debe tener al menos 6 caracteres",});
+        }
+      } else {
+        setError({email: "Debe ser correo electronico",password: "", repeatPassword: "",});
+      }
+    } else {
+      setError({email: "El correo es obligatorio",password: "La contraseña es obligatoria", repeatPassword: "La contraseña es obligatoria",});
+    }
+  };
   return (
     <KeyboardAwareScrollView>
       <Image
@@ -44,6 +66,7 @@ export default function CreateUser() {
             containerStyle={styles.input}
             onChange={(e) => changePayload(e, "email")}
             errorMessage={error.email}
+            autoCapitalize="none"
           />
           <Input
             placeholder="Contraseña"
@@ -90,31 +113,31 @@ export default function CreateUser() {
   );
 }
 
-
 const styles = StyleSheet.create({
-    logo:{
-        width: "100%",
-        height: 150,
-        marginTop: 30,
-    },
-    viewForm:{
-        marginHorizontal:20,
-    },
-    container:{
-        flex:1,
-        alignItems:"center",
-        justifyContent:"center",
-        marginTop: 30,
-    },
-    input:{
-        width:"100%",
-        marginVertical:10
-    },
-    btnContainer:{
-        marginVertical: 20,
-        width:"95%",
-    },
-    btn:{
-        backgroundColor:"#00a680" //#28a745
-    },
+  logo: {
+    width: "100%",
+    height: 150,
+    marginTop: 30,
+  },
+  viewForm: {
+    marginHorizontal: 20,
+  },
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 30,
+  },
+  input: {
+    width: "100%",
+    marginVertical: 10,
+  },
+  btnContainer: {
+    //marginVertical: 20,
+    marginBottom: 20,
+    width: "95%",
+  },
+  btn: {
+    backgroundColor: "#00a680", //#28a745
+  },
 });
