@@ -35,17 +35,46 @@ export default function CreateUser() {
           if (data.password == data.repeatPassword) {
             setError(payload);
             console.log("listo pal registro");
+            createUserWithEmailAndPassword(auth, data.email, data.password)
+              .then((userCredential) => {
+                // Signed in
+                const user = userCredential.user;
+                console.log("Usuario creado")
+                
+                // ...
+              })
+              .catch((error) => {
+                const errorCode = error.code;
+                const errorMessage = error.message;
+                // ..
+              });
           } else {
-            setError({email: "",password: "Las contraseñas no coinciden",repeatPassword: "Las contraseñas no coinciden",});
+            setError({
+              email: "",
+              password: "Las contraseñas no coinciden",
+              repeatPassword: "Las contraseñas no coinciden",
+            });
           }
         } else {
-          setError({email: "",password: "La contraseña debe tener al menos 6 caracteres",repeatPassword: "La contraseña debe tener al menos 6 caracteres",});
+          setError({
+            email: "",
+            password: "La contraseña debe tener al menos 6 caracteres",
+            repeatPassword: "La contraseña debe tener al menos 6 caracteres",
+          });
         }
       } else {
-        setError({email: "Debe ser correo electronico",password: "", repeatPassword: "",});
+        setError({
+          email: "Debe ser correo electronico",
+          password: "",
+          repeatPassword: "",
+        });
       }
     } else {
-      setError({email: "El correo es obligatorio",password: "La contraseña es obligatoria", repeatPassword: "La contraseña es obligatoria",});
+      setError({
+        email: "El correo es obligatorio",
+        password: "La contraseña es obligatoria",
+        repeatPassword: "La contraseña es obligatoria",
+      });
     }
   };
   return (
