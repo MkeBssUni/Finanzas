@@ -7,7 +7,8 @@ import Loading from "../../kernel/components/Loading";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
 import { validateEmail } from "../../kernel/validations";
 
-export default function CreateUser() {
+export default function CreateUser(props) {
+  const { navigation } = props;
   const payload = {
     email: "",
     password: "",
@@ -35,17 +36,19 @@ export default function CreateUser() {
           if (data.password == data.repeatPassword) {
             setError(payload);
             console.log("listo pal registro");
+            setShow(true);
             createUserWithEmailAndPassword(auth, data.email, data.password)
               .then((userCredential) => {
                 // Signed in
                 const user = userCredential.user;
                 console.log("Usuario creado")
-                
-                // ...
-              })
+                setShow(false);
+                navigation.navigate('profileStack');
+              })  
               .catch((error) => {
                 const errorCode = error.code;
                 const errorMessage = error.message;
+
                 // ..
               });
           } else {

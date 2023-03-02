@@ -26,7 +26,7 @@ export default function Login(props) {
           const user = userCredential.user;
           console.log(user);
           setShow(false);
-          navigation.navigate("userGuestStack"); //OJOOOOOOOOOOOOOOOOOOOOOOOOOOO
+          navigation.navigate('userGuestStack'); //OJOOOOOOOOOOOOOOOOOOOOOOOOOOO
 
           try {
             await AsyncStorage.setItem('@session', JSON.stringify(user))

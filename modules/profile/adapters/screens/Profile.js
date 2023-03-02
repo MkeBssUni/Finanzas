@@ -14,26 +14,31 @@ export default function Profile() {
   const auth = getAuth();
   const navigation=useNavigation();
   const [user, setUser] = useState(null);
-
+  const [session, setSession]= useState(null);
+  const [reload, setReload] = useState(false);
+  
   useEffect(() => {
-    (async ()=>{
+    (async () => {
       try {
+        console.log("entro");
         const value = await AsyncStorage.getItem('@session')
-        console.log("session: "+value)
-        if(value !== null) {
-          setUser(true);
+        //console.log("sesion",value)
+        setSession(JSON.parse(value))
+        if (value !== null) {
+          setUser(true)
         }else{
-          setUser(false);
+          setUser(false)
         }
       } catch(e) {
-        console.log("error al obtener la sesion", e);
-
+       
       }
     })()
-  }, []);
+    setReload(false);
+  }, [reload])
 
+  //Usar en SIRA
   if(user===null) return <Loading />;
-  return user ? <UserLogged /> : <UserGuest navigation={navigation}/>; //Si el usuario esta logueado, muestra el componente UserLogged, sino, muestra el componente UserGuest
+  return user ? <UserLogged setReload={setReload} user={session} /> : <UserGuest navigation={navigation}/>; //Si el usuario esta logueado, muestra el componente UserLogged, sino, muestra el componente UserGuest
   
 }
 
