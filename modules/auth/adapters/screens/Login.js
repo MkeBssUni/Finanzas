@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View, ScrollView } from "react-native";
 import React, { useState } from "react";
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Input, Button, Image, Icon, color } from "@rneui/base";
+import { Input, Button, Image, Icon} from "@rneui/base";
 import { isEmpty } from "lodash";
 import Loading from "../../../../kernel/components/Loading";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
@@ -22,25 +21,13 @@ export default function Login(props) {
       setError({email: '', password: 'Usuario o contraseña incorrectos'});
       signInWithEmailAndPassword(auth, email, password)
         .then( async (userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-          console.log(user);
           setShow(false);
-          navigation.navigate('userGuestStack'); //OJOOOOOOOOOOOOOOOOOOOOOOOOOOO
-
-          try {
-            await AsyncStorage.setItem('@session', JSON.stringify(user))
-          } catch (e) {
-            console.log("error al guardar la sesion", e);
-          }
-          
+          navigation.navigate('profileStack'); 
         })
         .catch((error) => {
           setShow(false);
           const errorCode = error.code;
           const errorMessage = error.message;
-
-          // ..
         });
     } else {
       setError({email: 'El email es obligatorio', password: 'La contraseña es obligatoria'});

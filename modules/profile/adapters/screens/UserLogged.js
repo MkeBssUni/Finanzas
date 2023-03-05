@@ -1,111 +1,150 @@
-import { StyleSheet, Text, View } from 'react-native'
-import React, {useState, useEffect} from 'react'
-import { Button,Avatar } from '@rneui/base';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import Loading from '../../../../kernel/components/Loading';
+import { StyleSheet, Text, View } from "react-native";
+import React, { useState } from "react";
+import { Button, Avatar } from "@rneui/base";
+//import AsyncStorage from "@react-native-async-storage/async-storage";
+import Loading from "../../../../kernel/components/Loading";
+import Success from "../../../../kernel/components/Success";
+import Error from "../../../../kernel/components/Error";
+import Confirmation from "../../../../kernel/components/Confirmation";
 import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import { getAuth, updateProfile } from "firebase/auth";
-import * as Imagepicker from 'expo-image-picker';
-import * as Permissions from 'expo-permissions';
+import * as Imagepicker from "expo-image-picker";
+import * as Permissions from "expo-permissions";
 
 export default function UserLogged(props) {
-  const {setReload, user} = props;
-  const [show, setShow] = useState(false)
-  const removeValue = async () => {
-    try {
-      console.log("Elimando sesión")
-      setShow(true)
-      await AsyncStorage.removeItem('@session')
-      setShow(false)
-      setReload(true)
-    } catch(e) {
-    }
-    console.log('Done.')
-  }
+  const { user } = props;
+  const [show, setShow] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false)
+  const [showError, setShowError] = useState(false)
+  const [showConfirmation, setShowConfirmation] = useState(false)  
+  const auth = getAuth();
 
-  const uploadImage = async (uri) =>{
-    setShow(true)
+  /* const removeValue = async () => {
+    try {
+      console.log("Elimando sesión");
+      setShow(true);
+      await AsyncStorage.removeItem("@session");
+      setShow(false);
+      setReload(true);
+    } catch (e) {}
+    console.log("Done.");
+  }; */
+
+  const uploadImage = async (uri) => {
+    setShow(true);
     const response = await fetch(uri);
-    console.log("response",response)
-    const {_bodyBlob} = response;
+    const { _bodyBlob } = response;
     const storage = getStorage();
     const storageRef = ref(storage, `avatars/${user.uid}`);
-    return uploadBytes(storageRef, _bodyBlob)
-  }
+    return uploadBytes(storageRef, _bodyBlob);
+  };
 
-  const changeAvatar = async () =>{
-    const resultPermission= await Permissions.askAsync(Permissions.CAMERA)
-    if(resultPermission.permissions.camera.status !== 'denied'){
+  const uploadPhotoProfile = () => {
+    const storage = getStorage();
+    getDownloadURL(ref(storage, `avatars/${user.uid}`))
+      .then(async (url) => {
+        updateProfile(auth.currentUser,{
+          photoURL: url
+        })
+        setShow(false)
+        setShowSuccess(true)
+        setTimeout(() => {
+          setShowSuccess(false)
+        }, 2000);
+      })
+      .catch((err) => {
+        setShow(false)
+        console.log("Error al obtener la imagen", err);
+      });
+  };
+
+  const changeAvatar = async () => {
+    const resultPermission = await Permissions.askAsync(Permissions.CAMERA);
+    if (resultPermission.permissions.camera.status !== "denied") {
       let result = await Imagepicker.launchCameraAsync({
         mediaTypes: Imagepicker.MediaTypeOptions.Images,
         allowsEditing: true,
         quality: 1, //cuantas imagenes se van a guardar
         //base64: true, para convertir a base64 y guardar en la BD, si no lo pongo me devuelve un uri
-      })
-      if(!result.canceled){
-        uploadImage(result.assets[0].uri).then((response)=>{
-          console.log("Imagen actualizada")
-          setShow(false)
-        }).catch((err)=>{
-          console.log("Error al actualizar la imagen",err)
-        })
-      }else{
-        console.log("Cancelado")
-      }
+      });
+      if (!result.canceled) {
+        uploadImage(result.assets[0].uri)
+          .then((response) => {
+            uploadPhotoProfile();
+          })
+          .catch((err) => {
+            console.log("Error al actualizar la imagen", err);
+            setShow(false);
+            setShowError(true)
+            setTimeout(() => {
+              setShowError(false)
+            }, 2000);
+          });
+      } else {}
     }
-  }
-
+  };
   return (
     <View style={styles.container}>
-      <View style={styles.infoContainer}>
+      {user && (
+        <View style={styles.infoContainer}>
         <Avatar
-          size={'xlarge'}
+          size={"xlarge"}
           rounded
-          source={{ uri: "https://firebasestorage.googleapis.com/v0/b/finanzas-f41fa.appspot.com/o/avatar%2Fr5S1k4JtpjXHH863lUL9v1UFmhn2.jpg?alt=media&token=e83f3306-0c84-4b75-8bd3-8e4eda76d6e6" }}
+          source={{
+            uri: user.photoURL
+          }}
           containerStyle={styles.avatar}
         >
-          <Avatar.Accessory size={40} 
-            onPress={changeAvatar}
-          />
+          <Avatar.Accessory size={40} onPress={changeAvatar} />
         </Avatar>
         <View>
-          <Text style={styles.displayName}>{user ? user.providerData[0].displayName :'Castor Asesino' }</Text>
-          <Text>{user ? user.providerData[0].email: 'sin email'}</Text>
+          <Text style={styles.displayName}>
+            {" "}
+            {user ? user.displayName : "Castor Asesino"}{" "}
+          </Text>
+          <Text>{user ? user.email : "sin email"}</Text>
         </View>
       </View>
+      )}
       <Button
         title="Cerrar sesión"
         buttonStyle={styles.btnLogout}
-        onPress={removeValue}
+        onPress={() => setShowConfirmation(true)}
       />
-      <Loading show={show} text="Cerrando Sesión"/>
+      <Loading show={show} text="Actualizando" />
+      <Success show={showSuccess} text="Confirmado" />
+      <Error show={showError} text="Error" />
+      <Confirmation show={showConfirmation} 
+        onConfirm={()=> auth.signOut()} 
+        onCancel={()=> setShowConfirmation(false)}
+      text="¿Estás seguro de cerrar sesión?" />
     </View>
-  )
+  );
 }
 
 const styles = StyleSheet.create({
-  container:{
+  container: {
     minHeight: "100%",
-    backgroundColor: "white"
+    backgroundColor: "white",
   },
-  btnLogout:{
+  btnLogout: {
     width: "75%",
     borderRadius: 5,
-    alignSelf: 'center',
+    alignSelf: "center",
     marginVertical: 50,
-    backgroundColor:"tomato"
+    backgroundColor: "tomato",
   },
-  infoContainer:{
+  infoContainer: {
     alignItems: "center",
     justifyContent: "center",
     flexDirection: "row",
     paddingVertical: 30,
   },
-  avatar:{
+  avatar: {
     marginRight: 16,
   },
-  displayName:{
+  displayName: {
     fontWeight: "bold",
     paddingBottom: 5,
   },
-})
+});
