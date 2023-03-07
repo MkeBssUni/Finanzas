@@ -22,24 +22,28 @@ export default function Confirmation(props) {
                 <Button
                     title='Aceptar'
                     onPress={props.onConfirm}
-                    style={styles.btnConfirm}
+                    style={styles.btn}
                     icon={{
                         type:'material-community',
                         name:'check',
                         color:'#fff',
                     }}
                     iconPosition='right'
+                    containerStyle={styles.btnContainer}
+                    color={'green'}
                 />
                 <Button
                     title='Cancelar'
                     onPress={props.onCancel}
-                    style={styles.btnCancel}
+                    style={styles.btn}
                     icon={{
                         type:'material-community',
                         name:'close',
                         color:'#fff',
                     }}
                     iconPosition='right'
+                    containerStyle={styles.btnContainer}
+                    color={'red'}
                 />
             </View>
         </View>
@@ -79,10 +83,13 @@ const styles = StyleSheet.create({
         width:'100%',
         marginTop:20,
     },
-    btnConfirm:{
-        width:10,
+    btnContainer:{
+        flex: 1,
+        justifyContent:'center',
+        alignItems:'center',
+        borderRadius: 5,
     },
-    btnCancel:{
+    btn:{
         width:10,
     }
 })
