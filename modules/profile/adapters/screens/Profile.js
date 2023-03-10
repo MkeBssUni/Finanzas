@@ -21,9 +21,6 @@ export default function Profile() {
     });
   }, [])
 
-  //Usar en SIRA
-  /* if(user===null) return <Loading />;
-  return user ? <UserLogged user={session} /> : <UserGuest navigation={navigation}/>; */ //Si el usuario esta logueado, muestra el componente UserLogged, sino, muestra el componente UserGuest
   if(session === null) return <Loading show={true} text="Cargando"/>
   return session ? (
     <UserLogged user={user} />

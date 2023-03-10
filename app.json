@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "finanzas", 
+    "name": "finanzas",
     "slug": "finanzas",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -28,6 +28,11 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "8bb4e0cf-45fe-43e3-8b10-71299c7b55c3"
+      }
     }
   }
 }
