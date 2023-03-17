@@ -10,7 +10,7 @@ import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import { getAuth, updateProfile } from "firebase/auth";
 import * as Imagepicker from "expo-image-picker";
 import * as Permissions from "expo-permissions";
-
+import AccountOptions from './AccountOptions'
 export default function UserLogged(props) {
   const { user } = props;
   const [show, setShow] = useState(false);
@@ -106,6 +106,9 @@ export default function UserLogged(props) {
         </View>
       </View>
       )}
+
+      <AccountOptions />
+      
       <Button
         title="Cerrar sesión"
         buttonStyle={styles.btnLogout}
