@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, {useState} from 'react'
 import { ListItem, Icon } from '@rneui/base'
-import {map} from 'lodash'
+import {initial, map} from 'lodash'
 import Modal from '../../../../kernel/components/Modal'
 
 import ChangeAddress from './components/ChangeAddress'
@@ -12,19 +12,21 @@ export default function AccountOptions(props) {
   const {userInfo} = props;
   const [showModal, setShowModal] = useState(false)
   const [renderComponent, setRenderComponent] = useState(null)
-
+  const [nameUser, setnameUser] = useState(userInfo.displayName)
+  
   const selectComponent =(key)=>{
     switch(key){
       case 'displayName': 
-          setRenderComponent(<ChangeDisplayName />)
-          setShowModal(true)
+        setRenderComponent(<ChangeDisplayName name={nameUser} />)
+        setShowModal(true)
+
         break;
       case 'password': 
         setRenderComponent(<ChangePassword />)
         setShowModal(true)
         break;
       case 'address': 
-        setRenderComponent(<ChangeAddress />)
+        setRenderComponent(<ChangeAddress setShowModal={setShowModal} />)
         setShowModal(true)
         break;
         default:

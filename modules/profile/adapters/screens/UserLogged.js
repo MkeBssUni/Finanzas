@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import React, { useState } from "react";
 import { Button, Avatar } from "@rneui/base";
-//import AsyncStorage from "@react-native-async-storage/async-storage";
 import Loading from "../../../../kernel/components/Loading";
 import Success from "../../../../kernel/components/Success";
 import Error from "../../../../kernel/components/Error";
@@ -9,7 +8,7 @@ import Confirmation from "../../../../kernel/components/Confirmation";
 import {getStorage, ref, uploadBytes, getDownloadURL} from 'firebase/storage';
 import { getAuth, updateProfile } from "firebase/auth";
 import * as Imagepicker from "expo-image-picker";
-import * as Permissions from "expo-permissions";
+import * as MediaLibrary from 'expo-media-library'
 import AccountOptions from './AccountOptions'
 export default function UserLogged(props) {
   const { user } = props;
@@ -18,17 +17,6 @@ export default function UserLogged(props) {
   const [showError, setShowError] = useState(false)
   const [showConfirmation, setShowConfirmation] = useState(false)  
   const auth = getAuth();
-
-  /* const removeValue = async () => {
-    try {
-      console.log("Elimando sesión");
-      setShow(true);
-      await AsyncStorage.removeItem("@session");
-      setShow(false);
-      setReload(true);
-    } catch (e) {}
-    console.log("Done.");
-  }; */
 
   const uploadImage = async (uri) => {
     setShow(true);
@@ -59,9 +47,9 @@ export default function UserLogged(props) {
   };
 
   const changeAvatar = async () => {
-    const resultPermission = await Permissions.askAsync(Permissions.CAMERA);
-    if (resultPermission.permissions.camera.status !== "denied") {
-      let result = await Imagepicker.launchCameraAsync({
+    const {status} = await MediaLibrary.requestPermissionsAsync()
+    if (status !== "denied") {
+      let result = await Imagepicker.launchImageLibraryAsync({
         mediaTypes: Imagepicker.MediaTypeOptions.Images,
         allowsEditing: true,
         quality: 1, //cuantas imagenes se van a guardar
@@ -83,6 +71,7 @@ export default function UserLogged(props) {
       } else {}
     }
   };
+
   return (
     <View style={styles.container}>
       {user && (
@@ -99,16 +88,14 @@ export default function UserLogged(props) {
         </Avatar>
         <View>
           <Text style={styles.displayName}>
-            {" "}
-            {user ? user.displayName : "Castor Asesino"}{" "}
+            {user ? user.displayName : "Castor Asesino"}
           </Text>
           <Text>{user ? user.email : "sin email"}</Text>
         </View>
       </View>
       )}
 
-      <AccountOptions />
-      
+      <AccountOptions userInfo={user} />
       <Button
         title="Cerrar sesión"
         buttonStyle={styles.btnLogout}

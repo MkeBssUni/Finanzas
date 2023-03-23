@@ -1,7 +1,6 @@
 import { StyleSheet, Text, View } from 'react-native'
 import React, { useState } from 'react'
 import { Button, Input, Icon } from '@rneui/base'
-import { Divider } from '@rneui/themed';
 import { getAuth, updatePassword, EmailAuthProvider, reauthenticateWithCredential } from "firebase/auth";
 import { isEmpty, size } from 'lodash'
 import Loading from '../../../../../kernel/components/Loading'
@@ -140,10 +139,11 @@ export default function ChangePassword() {
 }
 
 const styles = StyleSheet.create({
-  input: {
-    marginTop: 16,
-  },
-  btn: {
+input: {
+  width: '100%',
+  marginVertical: 15,
+},
+btn: {
     backgroundColor: 'tomato',
     borderRadius: 10,
     width: '50%',
