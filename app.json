@@ -41,7 +41,8 @@
           "apiKey": "AIzaSyCiE5OGV1zrs7_vU9bLH4kg3yGt1V3o02s"
         }
       },
-      "package": "com.mkebssuni.finanzas"
+      "package": "com.mkebssuni.finanzas",
+      "googleServicesFile": "./google-services.json"
     },
     "web": {
       "favicon": "./assets/favicon.png"

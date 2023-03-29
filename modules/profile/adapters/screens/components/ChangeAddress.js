@@ -1,15 +1,81 @@
-import { StyleSheet, Text, View, Dimensions, Alert } from "react-native";
-import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Dimensions, Alert, Platform } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
 import * as Location from "expo-location";
 import * as MediaLibrary from 'expo-media-library'
 import MapView, { Marker } from "react-native-maps";
 import { Button, Divider } from "@rneui/base";
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
 
-const widthScreen = Dimensions.get("window").width; //Obtener el ancho del dispositivo que está abriendo el app
+/* Configuración global*/
+Notifications.setNotificationHandler({
+  handleNotification: async () => ({
+    shouldShowAlert: true,
+    shouldPlaySound: false,
+    shouldSetBadge: false,
+  }),
+});
+
+// Can use this function below OR use Expo's Push Notification Tool from: https://expo.dev/notifications to send push notifications.
+async function sendPushNotification(expoPushToken) {
+  const message = {
+    to: expoPushToken,
+    sound: 'default',
+    title: 'Su ubicación ha sido actualizada',
+    body: 'Dmn, pq te movisteeeeee',
+    //data: { someData: location },
+  };
+
+  await fetch('https://exp.host/--/api/v2/push/send', {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Accept-encoding': 'gzip, deflate',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(message),
+  });
+}
+//pedir permisos para notificaciones y obtener el token
+async function registerForPushNotificationsAsync() {
+  let token;
+  if (Device.isDevice) {
+    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    let finalStatus = existingStatus;
+    if (existingStatus !== 'granted') {
+      const { status } = await Notifications.requestPermissionsAsync();
+      finalStatus = status;
+    }
+    if (finalStatus !== 'granted') {
+      alert('Failed to get push token for push notification!');
+      return;
+    }
+    token = (await Notifications.getExpoPushTokenAsync()).data;
+    console.log(token);
+  } else {
+    alert('Must use physical device for Push Notifications');
+  }
+
+  if (Platform.OS === 'android') {
+    Notifications.setNotificationChannelAsync('default', {
+      name: 'default',
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: '#FF231F7C',
+    });
+  }
+
+  return token;
+}
+
 
 export default function ChangeAddress(props) {
   const { setShowModal } = props;
   const [location, setLocation] = useState(null);
+  const [expoPushToken, setExpoPushToken] = useState('');
+  const [notification, setNotification] = useState(false);
+  const notificationListener = useRef();
+  const responseListener = useRef();
 
   useEffect(() => {
     (async () => {
@@ -32,8 +98,25 @@ export default function ChangeAddress(props) {
     })();
   }, []);
 
-  const save = ()=>{
-    console.log("holaaa", location)
+  useEffect(() => {
+    registerForPushNotificationsAsync().then(token => setExpoPushToken(token));
+
+    notificationListener.current = Notifications.addNotificationReceivedListener(notification => {
+      setNotification(notification);
+    });
+
+    responseListener.current = Notifications.addNotificationResponseReceivedListener(response => {
+      console.log(response);
+    });
+
+    return () => {
+      Notifications.removeNotificationSubscription(notificationListener.current);
+      Notifications.removeNotificationSubscription(responseListener.current);
+    };
+  }, []);
+
+  const save = async ()=>{
+    await sendPushNotification(expoPushToken);
   }
   return (
     <View>
@@ -50,9 +133,8 @@ export default function ChangeAddress(props) {
               latitude: location.latitude,
               longitude: location.longitude,
             }}
-            tile="Mi ubicación" //Muestra
-            /* Description */
-            draggable //Que el usario pueda mover la marca
+            tile="Mi ubicación"
+            draggable
           />
         </MapView>
       )}
@@ -64,7 +146,7 @@ export default function ChangeAddress(props) {
           title="Cerrar mapa"
           containerStyle={styles.btnDangerContainer}
           buttonStyle={styles.btnDanger}
-          onPress={() => setShowModal(false)}//ojito
+          onPress={() => setShowModal(false)}
         />
         <Button
           title="Guardar ubicación"
@@ -103,6 +185,4 @@ const styles = StyleSheet.create({
   btnSuccess:{
     backgroundColor: '#00a680'
   }
-
-  
 });
